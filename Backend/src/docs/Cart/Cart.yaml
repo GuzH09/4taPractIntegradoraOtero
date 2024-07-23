@@ -1,0 +1,345 @@
+openapi: 3.0.1
+info:
+  title: Carts API
+  description: API for managing carts
+  version: 1.0.0
+
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: auth
+
+  schemas:
+    Product:
+      type: object
+      properties:
+        product:
+          type: string
+        quantity:
+          type: integer
+
+    Cart:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: The cart ID
+        products:
+          type: array
+          items:
+            $ref: '#/components/schemas/Product'
+
+    Ticket:
+      type: object
+      properties:
+        purchase_datetime:
+          type: string
+          format: date-time
+        amount:
+          type: integer
+        purchaser:
+          type: string
+
+paths:
+  /api/carts:
+    post:
+      tags: [Cart]
+      summary: Create a new empty cart
+      description: Create a new empty cart
+      security:
+        - cookieAuth: []
+      responses:
+        '201':
+          description: Cart created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  result:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/carts/{cid}:
+    get:
+      tags: [Cart]
+      summary: Get a cart by ID
+      description: Get a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+      responses:
+        '200':
+          description: Cart retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  carts:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      tags: [Cart]
+      summary: Delete all products from a cart
+      description: Delete all products from a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+      responses:
+        '200':
+          description: Cart cleared successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  carts:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    put:
+      tags: [Cart]
+      summary: Update products in a cart
+      description: Update products in a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                products:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Product'
+      responses:
+        '200':
+          description: Cart updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  carts:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/carts/{cid}/product/{pid}:
+    post:
+      tags: [Cart]
+      summary: Add a product to a cart
+      description: Add a product to a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: The product ID
+      responses:
+        '201':
+          description: Product added to cart successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  result:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    delete:
+      tags: [Cart]
+      summary: Delete a product from a cart
+      description: Delete a product from a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: The product ID
+      responses:
+        '200':
+          description: Product removed from cart successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  carts:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+    put:
+      tags: [Cart]
+      summary: Update product quantity in a cart
+      description: Update the quantity of a product in a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+        - in: path
+          name: pid
+          required: true
+          schema:
+            type: string
+          description: The product ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                quantity:
+                  type: integer
+      responses:
+        '200':
+          description: Product quantity updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  carts:
+                    $ref: '#/components/schemas/Cart'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+
+  /api/carts/{cid}/purchase:
+    post:
+      tags: [Cart]
+      summary: Finish purchase of a cart
+      description: Finish the purchase of a cart by its ID
+      security:
+        - cookieAuth: []
+      parameters:
+        - in: path
+          name: cid
+          required: true
+          schema:
+            type: string
+          description: The cart ID
+      responses:
+        '200':
+          description: Purchase finished successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  result:
+                    $ref: '#/components/schemas/Ticket'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
